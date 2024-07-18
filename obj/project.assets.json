@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\VSCodeProj\\testwebsite\\jkspce\\jkspce.csproj",
+      "projectUniqueName": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj",
       "projectName": "jkspce",
-      "projectPath": "C:\\VSCodeProj\\testwebsite\\jkspce\\jkspce.csproj",
+      "projectPath": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj",
       "packagesPath": "C:\\Users\\LG\\.nuget\\packages\\",
-      "outputPath": "C:\\VSCodeProj\\testwebsite\\jkspce\\obj\\",
+      "outputPath": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\LG\\AppData\\Roaming\\NuGet\\NuGet.Config"

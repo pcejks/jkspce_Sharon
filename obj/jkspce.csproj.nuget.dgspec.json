@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\VSCodeProj\\TestWebSite\\jkspce\\jkspce.csproj": {}
+    "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj": {}
   },
   "projects": {
-    "C:\\VSCodeProj\\TestWebSite\\jkspce\\jkspce.csproj": {
+    "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\VSCodeProj\\TestWebSite\\jkspce\\jkspce.csproj",
+        "projectUniqueName": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj",
         "projectName": "jkspce",
-        "projectPath": "C:\\VSCodeProj\\TestWebSite\\jkspce\\jkspce.csproj",
+        "projectPath": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\jkspce.csproj",
         "packagesPath": "C:\\Users\\LG\\.nuget\\packages\\",
-        "outputPath": "C:\\VSCodeProj\\TestWebSite\\jkspce\\obj\\",
+        "outputPath": "C:\\VSCodeProj\\TestWebSite\\jkspce_Sharon\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\LG\\AppData\\Roaming\\NuGet\\NuGet.Config"
