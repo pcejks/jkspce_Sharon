@@ -8,9 +8,9 @@ pipeline {
         //您的Docker Hub映像名稱
         DOCKER_IMAGE = 'pcejks/jkspce' //'your_dockerhub_username/your_image_name'
         //Docker Hub憑證ID，這需要在Jenkins中預先配置。
-        DOCKER_CREDENTIALS_ID = 'dockerhub'//'dockerhub_credentials'
+        DOCKER_CREDENTIALS_ID = 'a5a88dce-aa80-4289-b66b-577eb24dd9c3'//'dockerhub_credentials'
         //GitHub SSH憑證ID，這需要在Jenkins中預先配置。
-        SSH_CREDENTIALS_ID = 'sshkey'//'github_ssh_credentials'
+        SSH_CREDENTIALS_ID = 'ca0d7de6-8dfc-4871-94e7-39681265d03f'//'github_ssh_credentials'
     }
 
     stages {
