@@ -18,7 +18,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // 使用SSH憑證從GitHub獲取程式碼
-                git credentialsId: "${SSH_CREDENTIALS_ID}", url: "${GIT_REPO}"
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO}", credentialsId: "${SSH_CREDENTIALS_ID}"]]])
             }
         }
         //使用Docker命令來構建映像
