@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         // 定義環境變量
+        DOCKER_CLI_EXPERIMENTAL = 'enabled'
         //您的GitHub存儲庫URL
         GIT_REPO = 'git@github.com:pcejks/jkspce_Sharon.git'
         //您的Docker Hub映像名稱
