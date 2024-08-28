@@ -1,10 +1,10 @@
 pipeline {
-    //agent any
-    agent {
-        docker {
-            image 'google/cloud-sdk:slim'
-            args '-v /path/to/your/credentials:/root/.config/gcloud'
-        }
+    agent any
+    //agent {
+    //    docker {
+    //        image 'google/cloud-sdk:slim'
+    //        args '-v /path/to/your/credentials:/root/.config/gcloud'
+    //    }
     }
 
     environment {
@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:22'
+        IMAGE = 'pcejks/jkspce:23'
     }
 
     stages {
@@ -89,9 +89,9 @@ pipeline {
                 withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
                         // 取得集群憑證
-                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                        sh '/usr/local/bin/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                         //sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                        sh "gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
+                        sh "/usr/local/bin/gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
                         
                         // 建立 Kubernetes 部署文件
                         sh """
