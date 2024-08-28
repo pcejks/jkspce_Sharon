@@ -12,6 +12,9 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'a5a88dce-aa80-4289-b66b-577eb24dd9c3'//'dockerhub_credentials'
         //GitHub SSH憑證ID，這需要在Jenkins中預先配置。
         SSH_CREDENTIALS_ID = 'ca0d7de6-8dfc-4871-94e7-39681265d03f'//'github_ssh_credentials'
+        GCP_PROJECT = "hip-watch-433914-q8"  //2024-08-28 新增
+        GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
+        GKE_ZONE = "us-central1" //2024-08-28 新增
     }
 
     stages {
@@ -42,6 +45,28 @@ pipeline {
             }
         }
     }
+    
+    stage('Deploy to GKE') {
+            steps {
+                script {
+                    // 設定 GCP 認證
+                    withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        // 認證到 GKE
+                        sh """
+                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+                        gcloud config set project ${GCP_PROJECT}
+                        gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
+                        """
+
+                        // 使用 kubectl 部署到 GKE
+                        sh """
+                        kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
+                        """
+                    }
+                }
+            }
+        }
+    
 
     post {
         always {
@@ -56,3 +81,7 @@ pipeline {
         }
     }
 }
+
+
+
+    
