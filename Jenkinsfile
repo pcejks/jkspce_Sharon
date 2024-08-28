@@ -15,7 +15,7 @@ pipeline {
         GCP_PROJECT = "hip-watch-433914-q8"  //2024-08-28 新增
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
-        IMAGE = 'pcejks/jkspce:latest'
+        IMAGE = 'pcejks/jkspce:12'
     }
 
     stages {
