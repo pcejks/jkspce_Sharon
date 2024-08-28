@@ -1,5 +1,11 @@
 pipeline {
-    agent any
+    //agent any
+    agent {
+        docker {
+            image 'google/cloud-sdk:slim'
+            args '-v /path/to/your/credentials:/root/.config/gcloud'
+        }
+    }
 
     environment {
         // 定義環境變量
@@ -16,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:20'
+        IMAGE = 'pcejks/jkspce:22'
     }
 
     stages {
@@ -78,7 +84,7 @@ pipeline {
             //    }
             //}
 
-
+            //sh '/usr/local/bin/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
             steps {
                 withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
