@@ -45,26 +45,85 @@ pipeline {
             }
         }
     }
-    
+
     stage('Deploy to GKE') {
-            steps {
-                script {
+            //steps {
+            //    script {
                     // 設定 GCP 認證
-                    withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+            //        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         // 認證到 GKE
+            //            sh """
+            //            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+            //           gcloud config set project ${GCP_PROJECT}
+            //            gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
+            //            """
+                        // 使用 kubectl 部署到 GKE
+            //            sh """
+            //            kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
+            //            """
+            //        }
+            //    }
+            //}
+             steps {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        // 取得集群憑證
+                        sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                        sh "gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
+                        
+                        // 建立 Kubernetes 部署文件
                         sh """
-                        gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                        gcloud config set project ${GCP_PROJECT}
-                        gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
+                        cat <<EOF > deployment.yaml
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                          name: myapp-deployment
+                          labels:
+                            app: myapp
+                        spec:
+                          replicas: 2
+                          selector:
+                            matchLabels:
+                              app: myapp
+                          template:
+                            metadata:
+                              labels:
+                                app: myapp
+                            spec:
+                              containers:
+                              - name: myapp
+                                image: ${IMAGE}
+                                ports:
+                                - containerPort: 80
+                        EOF
                         """
 
-                        // 使用 kubectl 部署到 GKE
+                        // 部署到 GKE
+                        sh "kubectl apply -f deployment.yaml"
+
+                        // 曝露服務
                         sh """
-                        kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
+                        cat <<EOF > service.yaml
+                        apiVersion: v1
+                        kind: Service
+                        metadata:
+                          name: myapp-service
+                        spec:
+                          selector:
+                            app: myapp
+                          ports:
+                            - protocol: TCP
+                              port: 80
+                              targetPort: 80
+                          type: LoadBalancer
+                        EOF
                         """
+
+                        sh "kubectl apply -f service.yaml"
                     }
                 }
             }
+        
         }
     
 
