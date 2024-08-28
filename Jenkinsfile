@@ -45,7 +45,19 @@ pipeline {
                 }
             }
         }
-                stage('Deploy to GKE') {
+
+
+        stage('Pull Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
+                        docker.image("${IMAGE}").pull()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to GKE') {
             //steps {
             //    script {
                     // 設定 GCP 認證
