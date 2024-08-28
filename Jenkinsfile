@@ -17,115 +17,115 @@ pipeline {
         GKE_ZONE = "us-central1" //2024-08-28 新增
     }
 
-        stages {
-            //使用SSH憑證從GitHub克隆存儲庫
-            stage('Clone Repository') {
-                steps {
-                    // 使用SSH憑證從GitHub獲取程式碼
-                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO}", credentialsId: "${SSH_CREDENTIALS_ID}"]]])
+    stages {
+        //使用SSH憑證從GitHub克隆存儲庫
+        stage('Clone Repository') {
+            steps {
+                // 使用SSH憑證從GitHub獲取程式碼
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: "${GIT_REPO}", credentialsId: "${SSH_CREDENTIALS_ID}"]]])
+            }
+        }
+        //使用Docker命令來構建映像
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // 使用Docker命令來構建映像
+                    sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
                 }
             }
-            //使用Docker命令來構建映像
-            stage('Build Docker Image') {
-                steps {
-                    script {
-                        // 使用Docker命令來構建映像
-                        sh 'docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+        }
+        
+        //使用Docker插件和憑證將映像推送到Docker Hub
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
+                        sh 'docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}'
                     }
                 }
             }
-            
-            //使用Docker插件和憑證將映像推送到Docker Hub
-            stage('Push Docker Image') {
-                steps {
+        }
+                stage('Deploy to GKE') {
+            //steps {
+            //    script {
+                    // 設定 GCP 認證
+            //        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        // 認證到 GKE
+            //            sh """
+            //            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+            //           gcloud config set project ${GCP_PROJECT}
+            //            gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
+            //            """
+                        // 使用 kubectl 部署到 GKE
+            //            sh """
+            //            kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
+            //            """
+            //        }
+            //    }
+            //}
+            steps {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     script {
-                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                            sh 'docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}'
-                        }
-                    }
-                }
-            }
-                    stage('Deploy to GKE') {
-                //steps {
-                //    script {
-                        // 設定 GCP 認證
-                //        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                            // 認證到 GKE
-                //            sh """
-                //            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                //           gcloud config set project ${GCP_PROJECT}
-                //            gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
-                //            """
-                            // 使用 kubectl 部署到 GKE
-                //            sh """
-                //            kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
-                //            """
-                //        }
-                //    }
-                //}
-                steps {
-                    withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        script {
-                            // 取得集群憑證
-                            sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                            sh "gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
-                            
-                            // 建立 Kubernetes 部署文件
-                            sh """
-                            cat <<EOF > deployment.yaml
-                            apiVersion: apps/v1
-                            kind: Deployment
+                        // 取得集群憑證
+                        sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                        sh "gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
+                        
+                        // 建立 Kubernetes 部署文件
+                        sh """
+                        cat <<EOF > deployment.yaml
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                        name: myapp-deployment
+                        labels:
+                            app: myapp
+                        spec:
+                        replicas: 2
+                        selector:
+                            matchLabels:
+                            app: myapp
+                        template:
                             metadata:
-                            name: myapp-deployment
                             labels:
                                 app: myapp
                             spec:
-                            replicas: 2
-                            selector:
-                                matchLabels:
-                                app: myapp
-                            template:
-                                metadata:
-                                labels:
-                                    app: myapp
-                                spec:
-                                containers:
-                                - name: myapp
-                                    image: ${IMAGE}
-                                    ports:
-                                    - containerPort: 80
-                            EOF
-                            """
+                            containers:
+                            - name: myapp
+                                image: ${IMAGE}
+                                ports:
+                                - containerPort: 80
+                        EOF
+                        """
 
-                            // 部署到 GKE
-                            sh "kubectl apply -f deployment.yaml"
+                        // 部署到 GKE
+                        sh "kubectl apply -f deployment.yaml"
 
-                            // 曝露服務
-                            sh """
-                            cat <<EOF > service.yaml
-                            apiVersion: v1
-                            kind: Service
-                            metadata:
-                            name: myapp-service
-                            spec:
-                            selector:
-                                app: myapp
-                            ports:
-                                - protocol: TCP
-                                port: 80
-                                targetPort: 80
-                            type: LoadBalancer
-                            EOF
-                            """
+                        // 曝露服務
+                        sh """
+                        cat <<EOF > service.yaml
+                        apiVersion: v1
+                        kind: Service
+                        metadata:
+                        name: myapp-service
+                        spec:
+                        selector:
+                            app: myapp
+                        ports:
+                            - protocol: TCP
+                            port: 80
+                            targetPort: 80
+                        type: LoadBalancer
+                        EOF
+                        """
 
-                            sh "kubectl apply -f service.yaml"
-                        }
+                        sh "kubectl apply -f service.yaml"
                     }
                 }
-            
             }
-
+        
         }
+
+    }
 
 
     
