@@ -5,7 +5,7 @@ pipeline {
     //        image 'google/cloud-sdk:slim'
     //        args '-v /path/to/your/credentials:/root/.config/gcloud'
     //    }
-    }
+    //}
 
     environment {
         // 定義環境變量
@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:23'
+        IMAGE = 'pcejks/jkspce:24'
     }
 
     stages {
