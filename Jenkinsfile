@@ -16,7 +16,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:17'
+        IMAGE = 'pcejks/jkspce:20'
     }
 
     stages {
