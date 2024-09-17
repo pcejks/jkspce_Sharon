@@ -92,9 +92,9 @@ pipeline {
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         script {
                             // 取得集群憑證
-                            sh '/usr/local/bin/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                            //sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                            sh "/usr/local/bin/gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
+                            sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                            //sh "gclou/usr/local/bin/d auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                            sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
                             
                             // 建立 Kubernetes 部署文件
                             sh """
