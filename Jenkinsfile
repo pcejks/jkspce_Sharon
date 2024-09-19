@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:35'
+        IMAGE = 'pcejks/jkspce:41'
     }
 
     stages {
@@ -94,7 +94,7 @@ pipeline {
                             // 取得集群憑證
                             sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                             //sh "gclou/usr/local/bin/d auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                            sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${CLUSTER} --zone ${ZONE} --project ${PROJECT}"
+                            sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                             
                             // 建立 Kubernetes 部署文件
                             sh """
