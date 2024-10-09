@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:68'
+        IMAGE = 'pcejks/jkspce:69'
     }
 
     stages {
@@ -67,9 +67,10 @@ pipeline {
 
         stage('Deploy to GKE') {
             steps {
-                withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin']) {
-                    sh '$GCLOUD_PATH/gcloud --version'
-                    sh '$GCLOUD_PATH/gke-gcloud-auth-plugin --version'
+                withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin', 'PATH+GCP=$GCLOUD_PATH:$PATH']) {
+                    sh 'echo $PATH'
+                    sh 'gcloud --version'
+                    sh 'gke-gcloud-auth-plugin --version'
                     //sh 'gcloud --version'
                     //sh 'gke-gcloud-auth-plugin --version'
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
@@ -85,7 +86,7 @@ pipeline {
 
 // 建立 Kubernetes 部署文件
 sh '''
-cat <<EOF > deployment.yaml
+cat <<EOF > ${WORKSPACE}/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -110,13 +111,12 @@ spec:
 
 EOF
 '''
-sh "chmod 777 deployment.yaml"
 // 部署到 GKE
-sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/deployment.yaml"
+sh "kubectl apply -f ${WORKSPACE}/deployment.yaml"
 
 // 曝露服務
 sh '''
-cat <<EOF > service.yaml
+cat <<EOF > ${WORKSPACE}/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -131,8 +131,7 @@ ports:
 type: LoadBalancer
 EOF
 '''
-sh "chmod 777 service.yaml"
-sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/service.yaml"
+sh "kubectl apply -f ${WORKSPACE}/service.yaml"
                         }
                     }
                 }
