@@ -15,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:82'
+        IMAGE = 'pcejks/jkspce:83'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
