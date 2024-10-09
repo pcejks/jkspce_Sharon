@@ -15,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:78'
+        IMAGE = 'pcejks/jkspce:79'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
@@ -54,6 +54,48 @@ pipeline {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
                         docker.image("${IMAGE}").pull()
+                    }
+                }
+            }
+        }
+
+
+        stage('Configure kubectl') {
+            steps {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                        sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                        sh '''
+                        mkdir -p ~/.kube
+                        cat <<EOF > ~/.kube/config
+                        apiVersion: v1
+                        clusters:
+                        - cluster:
+                            certificate-authority-data: <your-certificate-authority-data>
+                            server: https://<your-kubernetes-api-server>
+                          name: autopilot-cluster-1
+                        contexts:
+                        - context:
+                            cluster: autopilot-cluster-1
+                            user: your-user
+                          name: autopilot-cluster-1-context
+                        current-context: autopilot-cluster-1-context
+                        kind: Config
+                        preferences: {}
+                        users:
+                        - name: your-user
+                          user:
+                            auth-provider:
+                              config:
+                                access-token: <your-access-token>
+                                cmd-args: config config-helper --format=json
+                                cmd-path: /usr/lib/google-cloud-sdk/bin/gcloud
+                                expiry-key: '{.credential.token_expiry}'
+                                token-key: '{.credential.access_token}'
+                              name: gcp
+                        EOF
+                        '''
                     }
                 }
             }
