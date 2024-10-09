@@ -14,7 +14,6 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: index.docker.io/pcejks/jkspce:53 # 例如：index.docker.io/your-username/your-image:latest
+        image: index.docker.io/pcejks/jkspce:54
         ports:
         - containerPort: 80
-        
