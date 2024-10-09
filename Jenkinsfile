@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:67'
+        IMAGE = 'pcejks/jkspce:68'
     }
 
     stages {
@@ -84,7 +84,7 @@ pipeline {
 
 
 // 建立 Kubernetes 部署文件
-sh '
+sh '''
 cat <<EOF > deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -109,40 +109,13 @@ spec:
         - containerPort: 80
 
 EOF
-'
-// 建立 Kubernetes 部署文件
-sh """
-cat <<EOF > deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp-deployment
-  labels:
-    app: myapp
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: myapp
-  template:
-    metadata:
-      labels:
-        app: myapp
-    spec:
-      containers:
-      - name: myapp
-        image: ${IMAGE}
-        ports:
-        - containerPort: 80
-
-EOF
-"""
+'''
 sh "chmod 777 deployment.yaml"
 // 部署到 GKE
 sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/deployment.yaml"
 
 // 曝露服務
-sh """
+sh '''
 cat <<EOF > service.yaml
 apiVersion: v1
 kind: Service
@@ -157,7 +130,7 @@ ports:
     targetPort: 80
 type: LoadBalancer
 EOF
-"""
+'''
 sh "chmod 777 service.yaml"
 sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/service.yaml"
                         }
