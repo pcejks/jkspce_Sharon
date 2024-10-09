@@ -67,17 +67,18 @@ pipeline {
 
         stage('Deploy to GKE') {
             steps {
-                withEnv(['GCLOUD_PATH=/home/jenkins/google-cloud-sdk/bin']) {
-                    //sh '$GCLOUD_PATH/gcloud --version'
-                    sh 'gcloud --version'
-                    sh 'gke-gcloud-auth-plugin --version'
+                withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin']) {
+                    sh '$GCLOUD_PATH/gcloud --version'
+                    sh '$GCLOUD_PATH/gke-gcloud-auth-plugin --version'
+                    //sh 'gcloud --version'
+                    //sh 'gke-gcloud-auth-plugin --version'
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         script {
                             // 取得集群憑證
-                            //sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                            sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                            //sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                            sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                            sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                            //sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                            sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                            //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                             
 // 建立 Kubernetes 部署文件
 sh """
