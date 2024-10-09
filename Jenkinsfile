@@ -1,12 +1,5 @@
 pipeline {
     agent any
-    //agent {
-    //    docker {
-    //        image 'google/cloud-sdk:slim'
-    //        args '-v /path/to/your/credentials:/root/.config/gcloud'
-    //    }
-    //}
-
     environment {
         // 定義環境變量
         DOCKER_CLI_EXPERIMENTAL = 'enabled'
@@ -22,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:71'
+        IMAGE = 'pcejks/jkspce:72'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
@@ -79,7 +72,6 @@ pipeline {
                         // 取得集群憑證
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                         sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                        sh 
                     //withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     //    script {
                     //        // 取得集群憑證
@@ -90,61 +82,58 @@ pipeline {
                     sh 'pwd'
 
 
-// 建立 Kubernetes 部署文件
-sh '''
-cat <<EOF > ${WORKSPACE}/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp-deployment
-  labels:
-    app: myapp
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: myapp
-  template:
-    metadata:
-      labels:
-        app: myapp
-    spec:
-      containers:
-      - name: myapp
-        image: ${IMAGE}
-        ports:
-        - containerPort: 80
+                        // 建立 Kubernetes 部署文件
+                        sh '''
+                        cat <<EOF > ${WORKSPACE}/deployment.yaml
+                        apiVersion: apps/v1
+                        kind: Deployment
+                        metadata:
+                        name: myapp-deployment
+                        labels:
+                            app: myapp
+                        spec:
+                        replicas: 2
+                        selector:
+                            matchLabels:
+                            app: myapp
+                        template:
+                            metadata:
+                            labels:
+                                app: myapp
+                            spec:
+                            containers:
+                            - name: myapp
+                                image: ${IMAGE}
+                                ports:
+                                - containerPort: 80
 
-EOF
-'''
-// 部署到 GKE
-sh "kubectl apply -f ${WORKSPACE}/deployment.yaml"
+                        EOF
+                        '''
+                        // 部署到 GKE
+                        sh "kubectl apply -f ${WORKSPACE}/deployment.yaml"
 
-// 曝露服務
-sh '''
-cat <<EOF > ${WORKSPACE}/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-name: myapp-service
-spec:
-selector:
-    app: myapp
-ports:
-    - protocol: TCP
-    port: 80
-    targetPort: 80
-type: LoadBalancer
-EOF
-'''
-sh "kubectl apply -f ${WORKSPACE}/service.yaml"
-                        }
+                        // 曝露服務
+                        sh '''
+                        cat <<EOF > ${WORKSPACE}/service.yaml
+                        apiVersion: v1
+                        kind: Service
+                        metadata:
+                        name: myapp-service
+                        spec:
+                        selector:
+                            app: myapp
+                        ports:
+                            - protocol: TCP
+                            port: 80
+                            targetPort: 80
+                        type: LoadBalancer
+                        EOF
+                        '''
+                        sh "kubectl apply -f ${WORKSPACE}/service.yaml"
                     }
-                //}
+            }
+        //}
         }
-        
-        
-
     }
 
 
