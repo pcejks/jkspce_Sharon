@@ -96,32 +96,33 @@ pipeline {
                             //sh "gclou/usr/local/bin/d auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
                             sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                             
-                            // 建立 Kubernetes 部署文件
-                            sh """
-                            cat <<EOF > deployment.yaml
-                            apiVersion: apps/v1
-                            kind: Deployment
-                            metadata:
-                            name: myapp-deployment
-                            labels:
-                                app: myapp
-                            spec:
-                            replicas: 2
-                            selector:
-                                matchLabels:
-                                app: myapp
-                            template:
-                                metadata:
-                                labels:
-                                    app: myapp
-                                spec:
-                                containers:
-                                - name: myapp
-                                    image: ${IMAGE}
-                                    ports:
-                                    - containerPort: 80
-                            EOF
-                            """
+// 建立 Kubernetes 部署文件
+sh """
+cat <<EOF > deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: ${IMAGE}
+        ports:
+        - containerPort: 80
+
+EOF
+ """
 
                             // 部署到 GKE
                             sh "kubectl apply -f deployment.yaml"
