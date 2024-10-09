@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:56'
+        IMAGE = 'pcejks/jkspce:57'
     }
 
     stages {
@@ -66,25 +66,6 @@ pipeline {
         }
 
         stage('Deploy to GKE') {
-            //steps {
-            //    script {
-                    // 設定 GCP 認證
-            //        withCredentials([file(credentialsId: 'gcp-service-account-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        // 認證到 GKE
-            //            sh """
-            //            gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-            //           gcloud config set project ${GCP_PROJECT}
-            //            gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE}
-            //            """
-                        // 使用 kubectl 部署到 GKE
-            //            sh """
-            //            kubectl set image deployment/your-deployment-name your-container-name=${DOCKER_IMAGE}:latest
-            //            """
-            //        }
-            //    }
-            //}
-
-            //sh '/usr/local/bin/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
             steps {
                 withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin']) {
                     sh '$GCLOUD_PATH/gcloud --version'
@@ -123,29 +104,28 @@ spec:
 
 EOF
  """
+// 部署到 GKE
+sh "kubectl apply -f deployment.yaml"
 
-                            // 部署到 GKE
-                            sh "kubectl apply -f deployment.yaml"
+// 曝露服務
+sh """
+cat <<EOF > service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+name: myapp-service
+spec:
+selector:
+    app: myapp
+ports:
+    - protocol: TCP
+    port: 80
+    targetPort: 80
+type: LoadBalancer
+EOF
+"""
 
-                            // 曝露服務
-                            sh """
-                            cat <<EOF > service.yaml
-                            apiVersion: v1
-                            kind: Service
-                            metadata:
-                            name: myapp-service
-                            spec:
-                            selector:
-                                app: myapp
-                            ports:
-                                - protocol: TCP
-                                port: 80
-                                targetPort: 80
-                            type: LoadBalancer
-                            EOF
-                            """
-
-                            sh "kubectl apply -f service.yaml"
+sh "kubectl apply -f service.yaml"
                         }
                     }
                 }
