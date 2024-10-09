@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:63'
+        IMAGE = 'pcejks/jkspce:65'
     }
 
     stages {
@@ -108,6 +108,7 @@ spec:
 
 EOF
  """
+sh "chmod 777 deployment.yaml"
 // 部署到 GKE
 sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/deployment.yaml"
 
@@ -128,7 +129,7 @@ ports:
 type: LoadBalancer
 EOF
 """
-
+sh "chmod 777 service.yaml"
 sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/service.yaml"
                         }
                     }
