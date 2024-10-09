@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:66'
+        IMAGE = 'pcejks/jkspce:67'
     }
 
     stages {
@@ -81,6 +81,35 @@ pipeline {
                             //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                     sh 'cd /home/jenkins/JKs0000/jenkins_tmp'
                     sh 'pwd'
+
+
+// 建立 Kubernetes 部署文件
+sh '
+cat <<EOF > deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: ${IMAGE}
+        ports:
+        - containerPort: 80
+
+EOF
+'
 // 建立 Kubernetes 部署文件
 sh """
 cat <<EOF > deployment.yaml
@@ -107,7 +136,7 @@ spec:
         - containerPort: 80
 
 EOF
- """
+"""
 sh "chmod 777 deployment.yaml"
 // 部署到 GKE
 sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/deployment.yaml"
