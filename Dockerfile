@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-#ENV ASPNETCORE_URLS=http://+:5137 \
+
 #DOTNET_RUNNING_IN_CONTAINER=true
-EXPOSE 80
+EXPOSE 7150
 EXPOSE 443
 
 
@@ -32,5 +32,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+ENV ASPNETCORE_URLS=http://+:7150
 ENTRYPOINT ["dotnet", "jkspce.dll"]
 
