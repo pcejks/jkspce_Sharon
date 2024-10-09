@@ -22,7 +22,8 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:69'
+        IMAGE = 'pcejks/jkspce:70'
+        PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
     stages {
@@ -67,20 +68,25 @@ pipeline {
 
         stage('Deploy to GKE') {
             steps {
-                withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin', 'PATH+GCP=$GCLOUD_PATH:$PATH']) {
-                    sh 'echo $PATH'
+                //withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin', 'PATH+GCP=$GCLOUD_PATH:$PATH']) {
+                    //sh 'echo $PATH'
                     sh 'gcloud --version'
                     sh 'gke-gcloud-auth-plugin --version'
                     //sh 'gcloud --version'
                     //sh 'gke-gcloud-auth-plugin --version'
+                    
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        script {
-                            // 取得集群憑證
-                            sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                            //sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
-                            sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                            //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                    sh 'cd /home/jenkins/JKs0000/jenkins_tmp'
+                        // 取得集群憑證
+                        sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                        sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                        sh 
+                    //withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    //    script {
+                    //        // 取得集群憑證
+                    //        sh '$GCLOUD_PATH/gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                    //        //sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                    //        sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                    //        //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                     sh 'pwd'
 
 
@@ -134,7 +140,7 @@ EOF
 sh "kubectl apply -f ${WORKSPACE}/service.yaml"
                         }
                     }
-                }
+                //}
             }
         
         }
