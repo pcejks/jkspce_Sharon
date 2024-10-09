@@ -15,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:73'
+        IMAGE = 'pcejks/jkspce:74'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
@@ -88,21 +88,21 @@ cat <<EOF > ${WORKSPACE}/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: myapp-deployment
-labels:
+  name: myapp-deployment
+  labels:
     app: myapp
 spec:
-replicas: 2
-selector:
+  replicas: 2
+  selector:
     matchLabels:
-    app: myapp
-template:
+      app: myapp
+  template:
     metadata:
-    labels:
+      labels:
         app: myapp
     spec:
-    containers:
-    - name: myapp
+      containers:
+      - name: myapp
         image: ${IMAGE}
         ports:
         - containerPort: 80
@@ -118,12 +118,12 @@ cat <<EOF > ${WORKSPACE}/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-name: myapp-service
+  name: myapp-service
 spec:
-selector:
+  selector:
     app: myapp
-ports:
-    - protocol: TCP
+  ports:
+  - protocol: TCP
     port: 80
     targetPort: 80
 type: LoadBalancer
