@@ -15,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:74'
+        IMAGE = 'pcejks/jkspce:75'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
@@ -72,6 +72,7 @@ pipeline {
                         // 取得集群憑證
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                         sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                        sh "kubectl create clusterrolebinding jenkins-deployer-binding --clusterrole=cluster-admin --user=jenkinstest1@hip-watch-433914-q8.iam.gserviceaccount.com"
                     //withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                     //    script {
                     //        // 取得集群憑證
