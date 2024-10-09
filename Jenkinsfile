@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:60'
+        IMAGE = 'pcejks/jkspce:61'
     }
 
     stages {
@@ -79,7 +79,7 @@ pipeline {
                             //sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                             sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                             //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                            
+                    sh 'cd /home/jenkins/JKs0000/jenkins_tmp'
 // 建立 Kubernetes 部署文件
 sh """
 cat <<EOF > deployment.yaml
@@ -108,7 +108,7 @@ spec:
 EOF
  """
 // 部署到 GKE
-sh "kubectl apply -f deployment.yaml"
+sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/deployment.yaml"
 
 // 曝露服務
 sh """
@@ -128,7 +128,7 @@ type: LoadBalancer
 EOF
 """
 
-sh "kubectl apply -f service.yaml"
+sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/service.yaml"
                         }
                     }
                 }
