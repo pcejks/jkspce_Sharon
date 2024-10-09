@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:65'
+        IMAGE = 'pcejks/jkspce:66'
     }
 
     stages {
@@ -110,7 +110,7 @@ EOF
  """
 sh "chmod 777 deployment.yaml"
 // 部署到 GKE
-sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/deployment.yaml"
+sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/deployment.yaml"
 
 // 曝露服務
 sh """
@@ -130,7 +130,7 @@ type: LoadBalancer
 EOF
 """
 sh "chmod 777 service.yaml"
-sh "kubectl apply -f /home/jenkins/JKs0000/jenkins_tmp/service.yaml"
+sh "kubectl apply -f /var/lib/jenkins/workspace/PullGithubSourceToDockerhub/service.yaml"
                         }
                     }
                 }
