@@ -67,7 +67,7 @@ pipeline {
 
         stage('Deploy to GKE') {
             steps {
-                withEnv(['GCLOUD_PATH=/home/jenkins/JKs0000/google-cloud-sdk/bin']) {
+                withEnv(['GCLOUD_PATH=/home/jenkins/google-cloud-sdk/bin']) {
                     sh '$GCLOUD_PATH/gcloud --version'
                 
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
