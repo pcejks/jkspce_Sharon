@@ -10,7 +10,7 @@ EXPOSE 443
 # For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
 
 #RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
-RUN useradd -m appuser && chown -R appuser 
+RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:6.0 AS build
