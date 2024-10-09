@@ -22,7 +22,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:61'
+        IMAGE = 'pcejks/jkspce:62'
     }
 
     stages {
@@ -80,6 +80,7 @@ pipeline {
                             sh "$GCLOUD_PATH/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                             //sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                     sh 'cd /home/jenkins/JKs0000/jenkins_tmp'
+                    sh 'pwd'
 // 建立 Kubernetes 部署文件
 sh """
 cat <<EOF > deployment.yaml
