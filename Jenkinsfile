@@ -15,7 +15,7 @@ pipeline {
         GKE_CLUSTER = "autopilot-cluster-1" //2024-08-28 新增
         GKE_ZONE = "us-central1" //2024-08-28 新增
         GCP_CREDENTIALS = 'gcp-service-account'
-        IMAGE = 'pcejks/jkspce:79'
+        IMAGE = 'pcejks/jkspce:80'
         PATH = "/home/jenkins/JKs0000/google-cloud-sdk/bin:$PATH"
     }
 
@@ -148,7 +148,7 @@ spec:
       - name: myapp
         image: ${IMAGE}
         ports:
-        - containerPort: 80
+        - containerPort: 8080
 
 EOF
 '''
